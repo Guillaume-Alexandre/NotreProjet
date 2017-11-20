@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/i_gare_imv_icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/train"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/i_gare_imv_icon">
+
+        <TextView
+            android:id="@+id/i_gare_txv_intitule_gare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Default text visible only on Android Studio" />
+
+        <TextView
+            android:id="@+id/i_gare_txv_commune"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="City" />
+
+    </LinearLayout>
+
+</RelativeLayout>
