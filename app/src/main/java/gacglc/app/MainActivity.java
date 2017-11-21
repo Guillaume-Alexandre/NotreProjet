@@ -1,15 +1,18 @@
 package gacglc.app;
 
 import android.app.DownloadManager;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,19 +32,21 @@ import org.json.JSONObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GareListFragment.GareListListener, OwnIconRendered.OIRInterface{
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private gacglc.app.List list = new List();
     private FragmentManager fragmentManager;
     private FloatingActionButton addGareBtn;
+    private Button mapBtn;
+    private Button mainBtn;
     private ProgressBar pgbLoading;
 
     private RequestQueue requestQueue;
 
     Dao<Gare, String> gareDao;
-    ArrayList<Gare> garesDb = new ArrayList<>();
+    public ArrayList<Gare> garesDb = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +58,23 @@ public class MainActivity extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(MainActivity.this);
 
-        addGareBtn = (FloatingActionButton) findViewById(R.id.a_main_btn_add_bottle);
-        addGareBtn.setOnClickListener(new View.OnClickListener() {
+
+        final Intent mapsIntent = new Intent(this, MapsActivity.class);
+        mapsIntent.putParcelableArrayListExtra("GARES_LIST", garesDb);
+        mapBtn = (Button) findViewById(R.id.button2);
+        mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(mapsIntent);
+            }
+        });
 
+        final Intent mainIntent = new Intent(this, MainActivity.class);
+        mainBtn = (Button) findViewById(R.id.button3);
+        mainBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayGareList();
             }
         });
 
@@ -67,17 +84,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Get info about gares
         //getMyList("https://chivas-container.herokuapp.com/cellars/Gaetan");
-        getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=10");
+        getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=3500");
     }
 
-    private void displayGareList() {
-        // Show "+" button
-        addGareBtn.setVisibility(View.VISIBLE);
-
+    public void displayGareList() {
         // Create a fragment using factory method
         gacglc.app.GareListFragment gareListFragment = gacglc.app.GareListFragment.newInstance(getGares());
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.a_main_lyt_fragment_container, gareListFragment);
+        transaction.commit();
+    }
+
+    public void displayInfo(Gare gare) {
+        // Create a fragment using factory method
+        gacglc.app.GareInfoFragment gareInfoFragment = gacglc.app.GareInfoFragment.newInstance(gare);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.a_main_lyt_fragment_container, gareInfoFragment);
         transaction.commit();
     }
 
@@ -118,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 },
                 simpleErrorListener);
-
+        getGareRequest.setRetryPolicy(new DefaultRetryPolicy(
+                1000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(getGareRequest);
     }
 
@@ -132,7 +157,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onErrorResponse(VolleyError error) {
             //Log.e(TAG, error.getLocalizedMessage());
-            Toast.makeText(getApplicationContext(), "Erreur", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Non actualisé", Toast.LENGTH_SHORT).show();
+            displayGareList();
+            pgbLoading.setVisibility(View.GONE);
         }
     };
+
+    public void toaster() {
+        Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
+    }
 }

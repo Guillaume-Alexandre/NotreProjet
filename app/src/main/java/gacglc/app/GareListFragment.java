@@ -1,8 +1,10 @@
 package gacglc.app;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +26,15 @@ public class GareListFragment extends Fragment {
     private String mParam1;
 
     private GareListListener activity;
+    GareListListener mCallback;
 
     private ListView ltvGares;
     private ArrayList<Gare> gares;
     private GareAdapter gareAdapter;
+
+    public interface GareListListener {
+        public void displayInfo(Gare gare);
+    }
 
     public GareListFragment() {
         // Required empty public constructor
@@ -58,6 +65,20 @@ public class GareListFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (GareListListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement GareListListener");
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         activity = null;
@@ -76,7 +97,7 @@ public class GareListFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
                                            int pos, long id) {
-                activity.deleteItem(pos);
+                mCallback.displayInfo(gares.get(pos));
                 return true;
             }
         });
@@ -84,8 +105,6 @@ public class GareListFragment extends Fragment {
         return rootView;
     }
 
-    public interface GareListListener {
-        void deleteItem(int index);
-    }
+
 }
 

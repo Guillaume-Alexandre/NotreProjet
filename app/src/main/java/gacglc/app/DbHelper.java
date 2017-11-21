@@ -17,7 +17,7 @@ import java.sql.SQLException;
 
 public class DbHelper extends OrmLiteSqliteOpenHelper {
 
-    private static String DB_NAME = "myGares";
+    private static String DB_NAME = "MyGares";
     private static int DB_VERSION = 1;
 
     public DbHelper(Context context) {
