@@ -1,5 +1,7 @@
 package gacglc.app;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -9,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -44,11 +47,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-
+        final Intent mainIntent = new Intent(this, MainActivity.class);
 
         // Add a marker in Sydney and move the camera
         LatLng gardanne = new LatLng(43.45, 5.4667);
         googleMap.addMarker(new MarkerOptions().position(gardanne).title("Mines St Etienne"));
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+
+            @Override
+            public void onInfoWindowClick(Marker arg0) {
+                startActivity(mainIntent);
+            }
+        });
         mMap.moveCamera(CameraUpdateFactory.newLatLng(gardanne));
         setUpClusterer();
     }

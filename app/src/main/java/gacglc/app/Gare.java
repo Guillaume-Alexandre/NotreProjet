@@ -63,8 +63,8 @@ public class Gare implements Serializable, Parcelable {
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(intitule_gare);
         dest.writeString(commune);
+        dest.writeString(intitule_gare);
         dest.writeString(longitude_wgs84);
         dest.writeString(latitude_wgs84);
     }

@@ -32,7 +32,7 @@ import org.json.JSONObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements GareListFragment.GareListListener, OwnIconRendered.OIRInterface{
+public class MainActivity extends AppCompatActivity implements GareListFragment.GareListListener, OwnIconRendered.OIRInterface {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
