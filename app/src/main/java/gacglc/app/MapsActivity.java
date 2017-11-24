@@ -1,6 +1,7 @@
 package gacglc.app;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
+import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 
 import java.util.ArrayList;
 
@@ -41,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         gares = getIntent().getParcelableArrayListExtra("GARES_LIST");
     }
 
@@ -57,6 +60,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Show rationale and request permission.
+        }
 
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
@@ -112,4 +122,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MyItem offsetItem = new MyItem(lat, lng, title, pos);
         mClusterManager.addItem(offsetItem);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (permissions.length == 1 &&
+                permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Permission was denied. Display an error message.
+        }
+    }
+
+
+
 }

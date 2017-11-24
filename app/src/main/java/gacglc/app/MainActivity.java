@@ -1,6 +1,7 @@
 package gacglc.app;
 
 import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -31,6 +33,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -44,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     private Button mapBtn;
     private Button mainBtn;
     private Button detailsBtn;
+    private FloatingActionButton refresh;
     private ProgressBar pgbLoading;
     public static int VALUE=1;
 
@@ -90,6 +99,14 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
             }
         });
 
+        refresh = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actualise();
+            }
+        });
+
         pgbLoading = (ProgressBar) findViewById(R.id.a_main_pgb_loading);
 
         fragmentManager = getSupportFragmentManager();
@@ -98,6 +115,20 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
         // Get info about gares
         //getMyList("https://chivas-container.herokuapp.com/cellars/Gaetan");
         getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=3500");
+    }
+
+    public void disable() {
+        detailsBtn.setEnabled(false);
+        mainBtn.setEnabled(false);
+        mapBtn.setEnabled(false);
+        refresh.setEnabled(false);
+    }
+
+    public void enable() {
+        detailsBtn.setEnabled(true);
+        mainBtn.setEnabled(true);
+        mapBtn.setEnabled(true);
+        refresh.setEnabled(true);
     }
 
     @Override
@@ -121,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     }
 
     public void displayGareList() {
+        refresh.setVisibility(View.VISIBLE);
         // Create a fragment using factory method
         gacglc.app.GareListFragment gareListFragment = gacglc.app.GareListFragment.newInstance(getGares());
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -129,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     }
 
     public void displayInfo(Gare gare) {
+        refresh.setVisibility(View.INVISIBLE);
         // Create a fragment using factory method
         gacglc.app.GareInfoFragment gareInfoFragment = gacglc.app.GareInfoFragment.newInstance(gare);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -137,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     }
 
     public void displayDetails() {
+        refresh.setVisibility(View.INVISIBLE);
         // Create a fragment using factory method
         gacglc.app.DetailsFragment detailsFragment = gacglc.app.DetailsFragment.newInstance();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -157,36 +191,55 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     private void getMyList(String name) {
         cleanDao();
         pgbLoading.setVisibility(View.VISIBLE);
+        disable();
         String url = name;
-        StringRequest getGareRequest = new StringRequest(Request.Method.GET,
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Gson gson = new GsonBuilder().create();
-                        list = gson.fromJson(response, gacglc.app.List.class);
-                        ArrayList<Fields> truc = list.getRecords();
-                        for(Fields machin:truc)
-                            garesDb.add(machin.getFields());
+        if (!readFromFile(getApplicationContext()).equals("OK")) {
+            StringRequest getGareRequest = new StringRequest(Request.Method.GET,
+                    url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Gson gson = new GsonBuilder().create();
+                            list = gson.fromJson(response, gacglc.app.List.class);
+                            ArrayList<Fields> truc = list.getRecords();
+                            for (Fields machin : truc)
+                                garesDb.add(machin.getFields());
 
-                        try {
-                            for (int i=0; i<garesDb.size(); i++)
-                                gareDao.createOrUpdate(garesDb.get(i));
-                        } catch (SQLException e) {
-                            e.printStackTrace();
+                            try {
+                                for (int i = 0; i < garesDb.size(); i++)
+                                    gareDao.createOrUpdate(garesDb.get(i));
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            // Hide progress bar
+                            pgbLoading.setVisibility(View.INVISIBLE);
+                            // Display gare list fragment
+                            displayGareList();
+                            enable();
+
                         }
-                        // Hide progress bar
-                        pgbLoading.setVisibility(View.GONE);
-                        // Display gare list fragment
-                        displayGareList();
-                    }
-                },
-                simpleErrorListener);
-        getGareRequest.setRetryPolicy(new DefaultRetryPolicy(
-                20000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(getGareRequest);
+                    },
+                    simpleErrorListener);
+            getGareRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    20000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(getGareRequest);
+            writeToFile("OK", getApplicationContext());
+        }
+        else {
+            // Hide progress bar
+            pgbLoading.setVisibility(View.INVISIBLE);
+            // Display gare list fragment
+            displayGareList();
+            enable();
+        }
+
+    }
+
+    public void actualise() {
+        writeToFile("",getApplicationContext());
+        getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=3500");
     }
 
     private void cleanDao() {
@@ -213,4 +266,46 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     public void onBackPressed() {
         displayGareList();
     }
+
+    private void writeToFile(String data,Context context) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private String readFromFile(Context context) {
+
+        String ret = "NO";
+
+        try {
+            InputStream inputStream = context.openFileInput("config.txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.replace(0,2,receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
 }

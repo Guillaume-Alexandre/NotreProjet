@@ -8,6 +8,10 @@ Projet Androïd ISMIN P2018
 
 Pour lancer l'application, ouvrir le dossier *App* avec Android Studio et cliquer sur *Run*.
 
+Au premier lancement, l'application va charger tout le fichier des gares, ce qui peut prendre un peu de temps. Les fois suivantes, l'application ne les rechargeras pas depuis le serveur mais debuis la BDD créée. Il est possible d'actualisé les données en cliquant sur le bouton *Refresh* en bas à droite du fragment *liste*.
+
+Concernant la carte, veuillez activer la géolocalisation pour cette application. Si l'application est lancé depuis un appareil virtuel, pensez à envoyer la localisation depuis les paramètres de l'appareil virtuel pour bénéficier de la fonctionnalité.
+
 ### Prerequisites
 
 * Android Studio 2.3.3
