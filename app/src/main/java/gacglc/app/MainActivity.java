@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
 
     private gacglc.app.List list = new List();
     FragmentManager fragmentManager;
-    private FloatingActionButton addGareBtn;
     private Button mapBtn;
     private Button mainBtn;
     private Button detailsBtn;
@@ -113,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
         pgbLoading.setVisibility(View.INVISIBLE);
 
         // Get info about gares
-        //getMyList("https://chivas-container.herokuapp.com/cellars/Gaetan");
         getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=3500");
     }
 
