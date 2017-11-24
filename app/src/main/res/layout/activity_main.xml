@@ -44,7 +44,6 @@
         android:id="@+id/a_main_lyt_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/a_main_btn_add_bottle"
         android:layout_below="@+id/toolbar2">
 
     </FrameLayout>
