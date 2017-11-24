@@ -10,10 +10,12 @@ import com.google.maps.android.clustering.ClusterItem;
 public class MyItem implements ClusterItem {
     private final LatLng mPosition;
     private String mTitle;
+    public int mPos;
 
-    public MyItem(double lat, double lng, String title) {
+    public MyItem(double lat, double lng, String title, int pos) {
         mPosition = new LatLng(lat, lng);
         mTitle=title;
+        mPos=pos;
     }
 
     @Override
@@ -21,5 +23,6 @@ public class MyItem implements ClusterItem {
         return mPosition;
     }
 
+    public int getTag() { return mPos; }
     public String getTitle() {return mTitle; }
 }

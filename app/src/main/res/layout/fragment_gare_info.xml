@@ -10,6 +10,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="Gare :"
+            android:textAlignment="center" />
+
         <TextView
             android:id="@+id/textViewIntitule"
             android:layout_width="match_parent"
@@ -19,6 +32,14 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="Ville :"
+            android:textAlignment="center" />
+
+        <TextView
             android:id="@+id/textViewCommune"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,10 +47,26 @@
             android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="Latitude :"
+            android:textAlignment="center" />
+
+        <TextView
             android:id="@+id/textViewLat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="Longitude :"
             android:textAlignment="center" />
 
         <TextView

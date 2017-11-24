@@ -2,11 +2,13 @@ package gacglc.app;
 
 import android.app.DownloadManager;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -37,11 +39,13 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private gacglc.app.List list = new List();
-    private FragmentManager fragmentManager;
+    FragmentManager fragmentManager;
     private FloatingActionButton addGareBtn;
     private Button mapBtn;
     private Button mainBtn;
+    private Button detailsBtn;
     private ProgressBar pgbLoading;
+    public static int VALUE=1;
 
     private RequestQueue requestQueue;
 
@@ -65,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(mapsIntent);
+                startActivityForResult(mapsIntent, VALUE);
             }
         });
 
@@ -78,13 +82,42 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
             }
         });
 
+        detailsBtn = (Button) findViewById(R.id.button4);
+        detailsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayDetails();
+            }
+        });
+
         pgbLoading = (ProgressBar) findViewById(R.id.a_main_pgb_loading);
 
         fragmentManager = getSupportFragmentManager();
+        pgbLoading.setVisibility(View.INVISIBLE);
 
         // Get info about gares
         //getMyList("https://chivas-container.herokuapp.com/cellars/Gaetan");
         getMyList("https://data.sncf.com/api/records/1.0/search/?dataset=referentiel-gares-voyageurs&sort=intitule_gare&rows=3500");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
+
+        if (requestCode == VALUE) {
+            new Handler().post(new Runnable() {
+
+                @Override
+                public void run() {
+                    runBis(resultCode);
+                }
+                public void runBis(int resultCode) {
+                    gacglc.app.GareInfoFragment gareInfoFragment = gacglc.app.GareInfoFragment.newInstance(garesDb.get(resultCode));
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.replace(R.id.a_main_lyt_fragment_container, gareInfoFragment);
+                    transaction.commit();
+                }
+            });
+        }
     }
 
     public void displayGareList() {
@@ -103,6 +136,14 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
         transaction.commit();
     }
 
+    public void displayDetails() {
+        // Create a fragment using factory method
+        gacglc.app.DetailsFragment detailsFragment = gacglc.app.DetailsFragment.newInstance();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.a_main_lyt_fragment_container, detailsFragment);
+        transaction.commit();
+    }
+
     public ArrayList<Gare> getGares() {
         garesDb.clear();
         try {
@@ -115,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
 
     private void getMyList(String name) {
         cleanDao();
+        pgbLoading.setVisibility(View.VISIBLE);
         String url = name;
         StringRequest getGareRequest = new StringRequest(Request.Method.GET,
                 url,
@@ -159,11 +201,16 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
             //Log.e(TAG, error.getLocalizedMessage());
             Toast.makeText(getApplicationContext(), "Non actualisé", Toast.LENGTH_SHORT).show();
             displayGareList();
-            pgbLoading.setVisibility(View.GONE);
+            pgbLoading.setVisibility(View.INVISIBLE);
         }
     };
 
     public void toaster() {
         Toast.makeText(getApplicationContext(), "Clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        displayGareList();
     }
 }

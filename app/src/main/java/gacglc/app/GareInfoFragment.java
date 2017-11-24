@@ -58,19 +58,14 @@ public class GareInfoFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        setText();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_gare_info, container, false);
-        TextView txvCommune= rootView.findViewById(R.id.textViewCommune);
-        TextView txvIntitule= rootView.findViewById(R.id.textViewIntitule);
-        TextView txvLat= rootView.findViewById(R.id.textViewLat);
-        TextView txvLong= rootView.findViewById(R.id.textViewLong);
-        txvCommune.setText(gare.commune);
-        txvIntitule.setText(gare.intitule_gare);
-        txvLat.setText(gare.latitude_wgs84);
-        txvLong.setText(gare.longitude_wgs84);
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_gare_info, container, false);
     }
@@ -80,6 +75,19 @@ public class GareInfoFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    public void setText() {
+        View rootView = getView();
+        TextView txvCommune= rootView.findViewById(R.id.textViewCommune);
+        TextView txvIntitule= rootView.findViewById(R.id.textViewIntitule);
+        TextView txvLat= rootView.findViewById(R.id.textViewLat);
+        TextView txvLong= rootView.findViewById(R.id.textViewLong);
+        txvCommune.setText(gare.commune);
+        txvIntitule.setText(gare.intitule_gare);
+        txvLat.setText(gare.latitude_wgs84);
+        txvLong.setText(gare.longitude_wgs84);
+
     }
 
     @Override

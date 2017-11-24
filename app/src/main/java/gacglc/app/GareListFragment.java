@@ -93,12 +93,11 @@ public class GareListFragment extends Fragment {
         ltvGares = (ListView) rootView.findViewById(R.id.f_gare_lis_ltv_gares);
         gareAdapter = new GareAdapter(getContext(), gares);
         ltvGares.setAdapter(gareAdapter);
-        ltvGares.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        ltvGares.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+            public void onItemClick(AdapterView<?> arg0, View arg1,
                                            int pos, long id) {
                 mCallback.displayInfo(gares.get(pos));
-                return true;
             }
         });
 

@@ -1,10 +1,18 @@
 package gacglc.app;
 
-import android.app.Activity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,11 +29,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     ArrayList<Gare> gares;
+    FragmentManager fragmentManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        fragmentManager = getSupportFragmentManager();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -47,27 +58,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        final Intent mainIntent = new Intent(this, MainActivity.class);
-
-        // Add a marker in Sydney and move the camera
-        LatLng gardanne = new LatLng(43.45, 5.4667);
-        googleMap.addMarker(new MarkerOptions().position(gardanne).title("Mines St Etienne"));
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
             @Override
             public void onInfoWindowClick(Marker arg0) {
-                startActivity(mainIntent);
+                setResult((int) arg0.getTag(), new Intent());
+                finish();
+                /*gacglc.app.GareInfoFragment gareInfoFragment = gacglc.app.GareInfoFragment.newInstance(gares.get((int) arg0.getTag()));
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.a_main_lyt_fragment_container, gareInfoFragment);
+                transaction.commit();*/
             }
         });
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(gardanne));
         setUpClusterer();
     }
 
     public void addMarkers() {
-        for(Gare truc:gares)
-            if(truc.longitude_wgs84!=null && truc.latitude_wgs84!=null)
-                addItems(Double.parseDouble(truc.latitude_wgs84),Double.parseDouble(truc.longitude_wgs84), truc.intitule_gare);
-        //googleMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(truc.latitude_wgs84),Double.parseDouble(truc.longitude_wgs84))).title(truc.intitule_gare));
+        int i=0;
+        for(Gare truc:gares) {
+            truc.pos=i;
+            if (truc.longitude_wgs84 != null && truc.latitude_wgs84 != null)
+                addItems(Double.parseDouble(truc.latitude_wgs84), Double.parseDouble(truc.longitude_wgs84), truc.intitule_gare, truc.pos);
+            i++;
+            //googleMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(truc.latitude_wgs84),Double.parseDouble(truc.longitude_wgs84))).title(truc.intitule_gare));
+        }
     }
 
     public GoogleMap getMap() {
@@ -79,7 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void setUpClusterer() {
         // Position the map.
-        getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.45, 5.4667), 10));
+        getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46.5,3),5));
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
@@ -94,8 +108,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         addMarkers();
     }
 
-    private void addItems(double lat, double lng, String title) {
-        MyItem offsetItem = new MyItem(lat, lng, title);
+    private void addItems(double lat, double lng, String title, int pos) {
+        MyItem offsetItem = new MyItem(lat, lng, title, pos);
         mClusterManager.addItem(offsetItem);
     }
 }

@@ -23,6 +23,8 @@ public class Gare implements Serializable, Parcelable {
     @DatabaseField
     String longitude_wgs84;
 
+    int pos;
+
 
     public Gare () {}
 
@@ -55,6 +57,7 @@ public class Gare implements Serializable, Parcelable {
         intitule_gare = in.readString();
         longitude_wgs84 = in.readString();
         latitude_wgs84 = in.readString();
+        pos = in.readInt();
 
 
     }
@@ -67,5 +70,6 @@ public class Gare implements Serializable, Parcelable {
         dest.writeString(intitule_gare);
         dest.writeString(longitude_wgs84);
         dest.writeString(latitude_wgs84);
+        dest.writeInt(pos);
     }
 }
