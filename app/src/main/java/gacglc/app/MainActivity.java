@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements GareListFragment.
                 },
                 simpleErrorListener);
         getGareRequest.setRetryPolicy(new DefaultRetryPolicy(
-                1000,
+                20000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(getGareRequest);
