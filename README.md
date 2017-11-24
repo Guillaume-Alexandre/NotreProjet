@@ -1,6 +1,6 @@
 # NotreProjet!
 
-Application Androïd qui, après récupération sur le serveur d'OpenData de la SNCF www.data.sncf.com la liste des gares voyageurs, affiche cette liste, donne des infos détaillés et affiche une carte avec l'emplacement de chacune des gares.
+Application Android qui, après récupération sur le serveur d'OpenData de la SNCF www.data.sncf.com la liste des gares voyageurs, affiche cette liste, donne des infos détaillés et affiche une carte avec l'emplacement de chacune des gares.
 
 Projet Androïd ISMIN P2018
 

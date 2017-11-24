@@ -128,6 +128,23 @@
             android:layout_weight="1"
             android:text="   http://www.wtfpl.net/" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="30px" />
+
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   Pour plus d'information, lire le README.md" />
+
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text="   https://github.com/Guillaume-Alexandre/NotreProjet/blob/master/README.md" />
+
     </LinearLayout>
 
 </FrameLayout>
